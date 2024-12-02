@@ -49,39 +49,41 @@ def create_notion_page(notion, database_id, title, content, link):
     )
 
 def main():
-    # Load Notion credentials from environment variables
-    notion_token = os.environ.get('NOTION_KEY')
-    notion_database_id = os.environ.get('NOTION_DATABASE_ID')
+    try:
+        # Load Notion credentials from environment variables
+        notion_token = os.environ.get('NOTION_KEY')
+        notion_database_id = os.environ.get('NOTION_DATABASE_ID')
+        if not notion_token or not notion_database_id:
+            print("Notion Key or Database ID not set in environment variables")
+            return
 
-    if not notion_token or not notion_database_id:
-        print("Notion Key or Database ID not set in environment variables")
-        return
+        # Initialize Notion client
+        notion = Client(auth=notion_token)
 
-    # Initialize Notion client
-    notion = Client(auth=notion_token)
+        # Load feeds from YAML
+        feeds = load_feeds('feeds.yml')
 
-    # Load feeds from YAML
-    feeds = load_feeds('feeds.yml')
-
-    # Process each feed
-    for feed_config in feeds:
-        feed_name = feed_config['name']
-        feed_url = feed_config['url']
-
-        # Fetch RSS items
-        items = fetch_rss_items(feed_url)
-
-        # Post each item to Notion
-        for item in items:
-            create_notion_page(
-                notion, 
-                notion_database_id, 
-                f"{feed_name}: {item.get('title', 'Untitled')}", 
-                item.get('summary', 'No summary available'),
-                item.get('link', '')
-            )
-
-        print(f"Processed {len(items)} items from {feed_name}")
+        # Process each feed
+        for feed_config in feeds:
+            feed_name = feed_config['name']
+            feed_url = feed_config['url']
+            try:
+                # Fetch RSS items
+                items = fetch_rss_items(feed_url)
+                # Post each item to Notion
+                for item in items:
+                    create_notion_page(
+                        notion, 
+                        notion_database_id, 
+                        f"{feed_name}: {item.get('title', 'Untitled')}", 
+                        item.get('summary', 'No summary available'),
+                        item.get('link', '')
+                    )
+                print(f"Processed {len(items)} items from {feed_name}")
+            except Exception as e:
+                print(f"Error processing feed {feed_name}: {e}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
     main()
