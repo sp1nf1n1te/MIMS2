@@ -1,0 +1,19 @@
+name: RSS Feed Action
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  fetch-rss:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run RSS Feed Action
+        uses: ./  # This assumes your action is defined in the root of the repository
+        with:
+          feeds_file: 'feeds.yml'  # Reference to your feeds.yml file
