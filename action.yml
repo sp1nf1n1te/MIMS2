@@ -1,0 +1,10 @@
+name: 'RSS to Notion Fetcher'
+description: 'Fetch RSS feeds and post to Notion'
+inputs:
+  feeds_file:
+    description: 'Path to the YAML file containing RSS feeds'
+    required: true
+    default: 'feeds.yml'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
