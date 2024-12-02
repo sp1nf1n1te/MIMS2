@@ -12,11 +12,11 @@ def fetch_rss_items(feed_url):
     feed = feedparser.parse(feed_url)
     return feed.entries
 
-def create_notion_page(notion, page_id, title, content, link):
+def create_notion_page(notion, database_id, title, content, link):
     notion.pages.create(
-        parent={"page_id": page_id},
+        parent={"database_id": database_id},
         properties={
-            "title": {
+            "Name": {  # Adjust if your database uses a different title column
                 "title": [
                     {
                         "text": {
@@ -24,6 +24,9 @@ def create_notion_page(notion, page_id, title, content, link):
                         }
                     }
                 ]
+            },
+            "URL": {
+                "url": link
             }
         },
         children=[
@@ -47,11 +50,11 @@ def create_notion_page(notion, page_id, title, content, link):
 
 def main():
     # Load Notion credentials from environment variables
-    notion_token = os.environ.get('NOTION_TOKEN')
-    notion_page_id = os.environ.get('NOTION_PAGE_ID')
+    notion_token = os.environ.get('NOTION_KEY')
+    notion_database_id = os.environ.get('NOTION_DATABASE_ID')
 
-    if not notion_token or not notion_page_id:
-        print("Notion Token or Page ID not set in environment variables")
+    if not notion_token or not notion_database_id:
+        print("Notion Key or Database ID not set in environment variables")
         return
 
     # Initialize Notion client
@@ -72,7 +75,7 @@ def main():
         for item in items:
             create_notion_page(
                 notion, 
-                notion_page_id, 
+                notion_database_id, 
                 f"{feed_name}: {item.get('title', 'Untitled')}", 
                 item.get('summary', 'No summary available'),
                 item.get('link', '')
