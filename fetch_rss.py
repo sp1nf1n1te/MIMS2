@@ -16,7 +16,7 @@ def create_notion_page(notion, database_id, title, content, link):
     notion.pages.create(
         parent={"database_id": database_id},
         properties={
-            "Name": {  # Adjust if your database uses a different title column
+            "Aa Name": {  # Adjust if your database uses a different title column
                 "title": [
                     {
                         "text": {
